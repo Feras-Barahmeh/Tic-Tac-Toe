@@ -1,5 +1,5 @@
 from Configuration import *
-import pygame
+
 
 class Shingle:
     def __init__(self):
@@ -11,24 +11,30 @@ class Shingle:
         for row in range(0, TILE_AREA * 2, TILE_AREA):
             pygame.draw.line(screen,
                              WHITE,
-                             (MARGIN_X + row + TILE_AREA, MARGIN_Y),
-                             (MARGIN_X + row + TILE_AREA, MARGIN_Y + SHINGLE_DIVISION * TILE_AREA),
-                             5)
-
+                             (PADDING_X + row + TILE_AREA, PADDING_Y),
+                             (PADDING_X + row + TILE_AREA, PADDING_Y + SHINGLE_DIVISION * TILE_AREA),
+                             WIDTH_LINE)
 
         for col in range(0, TILE_AREA * 2, TILE_AREA):
             pygame.draw.line(screen,
                              WHITE,
-                             (MARGIN_X, MARGIN_Y + col + TILE_AREA),
-                             (MARGIN_X + SHINGLE_DIVISION * TILE_AREA, MARGIN_Y + col + TILE_AREA),
-                             5)
+                             (PADDING_X, PADDING_Y + col + TILE_AREA),
+                             (PADDING_X + SHINGLE_DIVISION * TILE_AREA, PADDING_Y + col + TILE_AREA),
+                             WIDTH_LINE)
 
-    def __clickPosition(self, mouseX, mouseY):
+    def ifValidClick(self, mouseX, mouseY):
+        """
+        :param mouseX: position of clicked mouse in x coordinate
+        :param mouseY: position of clicked mouse in y coordinate
+        :return: None, None: if the click out of the tiles and position tile if valid click
+        """
+
         for row in range(len(self.shingle)):
             for col in range(len(self.shingle[row])):
-                x, y = shingleToPixel(col, row)
-                if x <= mouseX <= x * TILE_AREA and y <= mouseY <= y + TILE_AREA and self.shingle[row][col] == '':
+                x, y = convertTilePositionToPixel(col, row)
+                if x <= mouseX <= x + TILE_AREA and y <= mouseY <= y + TILE_AREA and self.shingle[row][col] == '':
                     return row, col
+
         return None, None
 
 
