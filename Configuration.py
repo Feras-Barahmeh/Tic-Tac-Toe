@@ -2,7 +2,7 @@ import pygame
 from enum import Enum
 # Color
 WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+BLACK = (25, 25, 25)
 LIGHTGREY = (100, 100, 100)
 
 # Screen Characteristics
@@ -35,3 +35,11 @@ def convertTilePositionToPixel(index_X, index_Y) -> tuple:
 # Players
 class Player(Enum):
     computer = 1; human = 0
+
+NAMES = [
+    "Hind",
+    "Bunder",
+    "Saber",
+    "Tareq",
+    "Nofe",
+]

@@ -3,6 +3,7 @@ from Symbol import *
 from Configuration import *
 from random import randint
 
+
 class Game:
     def __init__(self):
         self.shingle = Shingle()
@@ -40,6 +41,12 @@ class Game:
         self.setSymbol()
         pygame.display.flip()
 
+    def testAI(self):
+        while True:
+            x = randint(0, len(self.shingle.shingle) - 1)
+            y = randint(0, len(self.shingle.shingle) - 1)
+            if self.shingle.shingle[x][y] == '':
+                return x, y
 
     def __events(self):
         for e in pygame.event.get():
@@ -58,7 +65,10 @@ class Game:
 
 
     def update(self):
-        pass
+        if self.player and not self.shingle.ifShingleFill() and not self.ifWinner(self.shingle.shingle, 'X'):
+            row, col = self.testAI()
+            self.switchPlayer(row, col)
+
 
     def startGame(self):
         self.playing = True
@@ -67,3 +77,23 @@ class Game:
             self.__events()
             self.update()
             self.__showScreen()
+
+
+    @staticmethod
+    def ifWinner(shingle, symbol) -> bool:
+        """
+        :param shingle: The patch we want to check
+        :param symbol: The player's symbol
+        :return: False if player He Hasn't Won Yet and True if won
+        """
+        for position, row in enumerate(shingle):
+            if row.count(symbol) == SHINGLE_DIVISION:
+                return True
+        if shingle[0][0] == symbol and shingle[1][1] == symbol and shingle[2][2] == symbol:
+            return True
+        if shingle[2][0] == symbol and shingle[1][1] == symbol and shingle[2][0] == symbol:
+            return True
+
+        return False
+
+
