@@ -1,8 +1,9 @@
+import time
+
 from Shingle import *
 from Symbol import *
-from Configuration import *
 from random import randint
-
+from Lines import *
 
 class Game:
     def __init__(self):
@@ -35,10 +36,22 @@ class Game:
                 x, y = convertTilePositionToPixel(j, i)
                 Symbol(x, y, symbol).createSymbol(self.screen)
 
+
     def __showScreen(self):
         self.screen.fill(BACKGROUND_COLOUR)
         self.shingle.divisionShingle(self.screen)
         self.setSymbol()
+
+        if self.ifWinner(self.shingle.shingle, "X"):
+            self.playing = False
+
+
+        if self.ifWinner(self.shingle.shingle, "O"):
+            self.playing = False
+
+        if self.shingle.ifShingleFill():
+            self.playing = False
+
         pygame.display.flip()
 
     def testAI(self):
@@ -64,7 +77,7 @@ class Game:
                         self.switchPlayer(row, col)
 
 
-    def update(self):
+    def __update(self):
         if self.player and not self.shingle.ifShingleFill() and not self.ifWinner(self.shingle.shingle, 'X'):
             row, col = self.testAI()
             self.switchPlayer(row, col)
@@ -75,23 +88,35 @@ class Game:
         while self.playing:
             self.clock.tick(FPS)
             self.__events()
-            self.update()
+            self.__update()
             self.__showScreen()
 
 
-    @staticmethod
-    def ifWinner(shingle, symbol) -> bool:
+
+    def ifWinner(self, shingle, symbol):
         """
         :param shingle: The patch we want to check
         :param symbol: The player's symbol
         :return: False if player He Hasn't Won Yet and True if won
         """
-        for position, row in enumerate(shingle):
-            if row.count(symbol) == SHINGLE_DIVISION:
+        print(shingle)
+        for row in range(SHINGLE_DIVISION):
+            if shingle[row][0] == symbol and shingle[row][1] == symbol and shingle[row][2] == symbol:
+                Lines(self.screen).horizontalLine(row)
                 return True
+
+        for col in range(SHINGLE_DIVISION):
+            if shingle[0][col] == symbol and shingle[1][col] == symbol and shingle[2][col] == symbol:
+                Lines(self.screen).verticalLine(col)
+                return True
+
+
         if shingle[0][0] == symbol and shingle[1][1] == symbol and shingle[2][2] == symbol:
+            Lines(self.screen).diagonalRight()
             return True
-        if shingle[2][0] == symbol and shingle[1][1] == symbol and shingle[2][0] == symbol:
+
+        if shingle[2][0] == symbol and shingle[1][1] == symbol and shingle[0][2] == symbol:
+            Lines(self.screen).diagonalLeft()
             return True
 
         return False
