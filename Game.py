@@ -1,5 +1,4 @@
-import time
-
+from time import sleep
 from Shingle import *
 from Symbol import *
 from random import randint
@@ -19,7 +18,6 @@ class Game:
         self.personSymbol = SYMBOLS[self.determinantSymbol - 1]
         self.computerSymbol = SYMBOLS[self.determinantSymbol]
 
-
     def newGame(self):
         """ start game  """
         self.shingle = Shingle()
@@ -34,7 +32,6 @@ class Game:
             self.shingle.shingle[row][col] = self.computerSymbol
         self.player = not self.player
 
-
     def setSymbol(self):
         for i, row in enumerate(self.shingle.shingle):
             for j, symbol in enumerate(row):
@@ -42,14 +39,23 @@ class Game:
                 Symbol(x, y, symbol).createSymbol(self.screen)
 
     def chickWinner(self, shingle, symbolFor : tuple):
-        if self.ifWinner(shingle, symbolFor[0]):
+        """
+        :param shingle: The Shingle We will Checking
+        :param symbolFor: tuple contain (Computer Symbol, Person symbol)
+        :return:
+        """
+        if self.whenWinner(shingle, symbolFor[0]):
+            print("Computer When")
             self.playing = False
 
-        if self.ifWinner(shingle, symbolFor[1]):
+        elif self.whenWinner(shingle, symbolFor[1]):
+            print("Player When ")
             self.playing = False
 
         if self.shingle.ifShingleFill():
+            print("Tie")
             self.playing = False
+        return
 
 
     def __showScreen(self):
@@ -57,7 +63,6 @@ class Game:
         self.shingle.divisionShingle(self.screen)
         self.setSymbol()
         self.chickWinner(self.shingle.shingle, (self.computerSymbol, self.personSymbol))
-
         pygame.display.flip()
 
     def testAI(self):
@@ -75,7 +80,7 @@ class Game:
 
             if e.type == pygame.MOUSEBUTTONDOWN:
                 # Human turn
-                if not self.player:
+                if not self.player and not self.shingle.ifShingleFill() and not self.ifWinner(self.shingle.shingle, self.computerSymbol):
                     mouseCoordinateX, mouseCoordinateY = pygame.mouse.get_pos()
                     row, col = self.shingle.ifValidClick(mouseCoordinateX, mouseCoordinateY)
                     if row is not None:
@@ -84,23 +89,50 @@ class Game:
 
 
     def __update(self):
-        if self.player and not self.shingle.ifShingleFill() and not self.ifWinner(self.shingle.shingle, self.computerSymbol):
+        if self.player and not self.shingle.ifShingleFill() and not self.ifWinner(self.shingle.shingle, self.personSymbol):
             row, col = self.testAI()
             self.switchPlayer(row, col)
 
 
-    def startGame(self):
+
+
+    def play(self):
         self.playing = True
         while self.playing:
             self.clock.tick(FPS)
             self.__events()
             self.__update()
             self.__showScreen()
+        else:
+            self.end_screen()
+
+    def whenWinner(self, shingle, symbol):
+        """
+        :param shingle: The patch we want to check
+        :param symbol: The player's symbol
+        :return: Draw Win Line
+        """
+        for row in range(SHINGLE_DIVISION):
+            if shingle[row][0] == symbol and shingle[row][1] == symbol and shingle[row][2] == symbol:
+                Lines(self.screen).horizontalLine(row)
+                return None
+
+        for col in range(SHINGLE_DIVISION):
+            if shingle[0][col] == symbol and shingle[1][col] == symbol and shingle[2][col] == symbol:
+                Lines(self.screen).verticalLine(col)
+                return None
+
+        if shingle[0][0] == symbol and shingle[1][1] == symbol and shingle[2][2] == symbol:
+            Lines(self.screen).diagonalRight()
+            return None
+
+        if shingle[2][0] == symbol and shingle[1][1] == symbol and shingle[0][2] == symbol:
+            Lines(self.screen).diagonalLeft()
+            return None
 
 
-
-
-    def ifWinner(self, shingle, symbol):
+    @staticmethod
+    def ifWinner(shingle, symbol):
         """
         :param shingle: The patch we want to check
         :param symbol: The player's symbol
@@ -108,22 +140,26 @@ class Game:
         """
         for row in range(SHINGLE_DIVISION):
             if shingle[row][0] == symbol and shingle[row][1] == symbol and shingle[row][2] == symbol:
-                Lines(self.screen).horizontalLine(row)
                 return True
 
         for col in range(SHINGLE_DIVISION):
             if shingle[0][col] == symbol and shingle[1][col] == symbol and shingle[2][col] == symbol:
-                Lines(self.screen).verticalLine(col)
                 return True
 
         if shingle[0][0] == symbol and shingle[1][1] == symbol and shingle[2][2] == symbol:
-            Lines(self.screen).diagonalRight()
             return True
 
         if shingle[2][0] == symbol and shingle[1][1] == symbol and shingle[0][2] == symbol:
-            Lines(self.screen).diagonalLeft()
             return True
 
         return False
 
+    def end_screen(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit(0)
 
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    return
