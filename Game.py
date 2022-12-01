@@ -14,6 +14,11 @@ class Game:
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
         self.player = None
+        self.computerScore = self.personScore = 0
+        self.determinantSymbol = randint(0, 1)
+        self.personSymbol = SYMBOLS[self.determinantSymbol - 1]
+        self.computerSymbol = SYMBOLS[self.determinantSymbol]
+
 
     def newGame(self):
         """ start game  """
@@ -24,9 +29,9 @@ class Game:
 
     def switchPlayer(self, row, col):
         if not self.player:
-            self.shingle.shingle[row][col] = "X"
+            self.shingle.shingle[row][col] = self.personSymbol
         else :
-            self.shingle.shingle[row][col] = "O"
+            self.shingle.shingle[row][col] = self.computerSymbol
         self.player = not self.player
 
 
@@ -36,21 +41,22 @@ class Game:
                 x, y = convertTilePositionToPixel(j, i)
                 Symbol(x, y, symbol).createSymbol(self.screen)
 
+    def chickWinner(self, shingle, symbolFor : tuple):
+        if self.ifWinner(shingle, symbolFor[0]):
+            self.playing = False
+
+        if self.ifWinner(shingle, symbolFor[1]):
+            self.playing = False
+
+        if self.shingle.ifShingleFill():
+            self.playing = False
+
 
     def __showScreen(self):
         self.screen.fill(BACKGROUND_COLOUR)
         self.shingle.divisionShingle(self.screen)
         self.setSymbol()
-
-        if self.ifWinner(self.shingle.shingle, "X"):
-            self.playing = False
-
-
-        if self.ifWinner(self.shingle.shingle, "O"):
-            self.playing = False
-
-        if self.shingle.ifShingleFill():
-            self.playing = False
+        self.chickWinner(self.shingle.shingle, (self.computerSymbol, self.personSymbol))
 
         pygame.display.flip()
 
@@ -78,7 +84,7 @@ class Game:
 
 
     def __update(self):
-        if self.player and not self.shingle.ifShingleFill() and not self.ifWinner(self.shingle.shingle, 'X'):
+        if self.player and not self.shingle.ifShingleFill() and not self.ifWinner(self.shingle.shingle, self.computerSymbol):
             row, col = self.testAI()
             self.switchPlayer(row, col)
 
@@ -93,13 +99,13 @@ class Game:
 
 
 
+
     def ifWinner(self, shingle, symbol):
         """
         :param shingle: The patch we want to check
         :param symbol: The player's symbol
         :return: False if player He Hasn't Won Yet and True if won
         """
-        print(shingle)
         for row in range(SHINGLE_DIVISION):
             if shingle[row][0] == symbol and shingle[row][1] == symbol and shingle[row][2] == symbol:
                 Lines(self.screen).horizontalLine(row)
@@ -109,7 +115,6 @@ class Game:
             if shingle[0][col] == symbol and shingle[1][col] == symbol and shingle[2][col] == symbol:
                 Lines(self.screen).verticalLine(col)
                 return True
-
 
         if shingle[0][0] == symbol and shingle[1][1] == symbol and shingle[2][2] == symbol:
             Lines(self.screen).diagonalRight()

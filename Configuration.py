@@ -36,6 +36,8 @@ def convertTilePositionToPixel(index_X, index_Y) -> tuple:
 class Player(Enum):
     computer = 1; human = 0
 
+SYMBOLS = ['X', 'O']
+
 NAMES = [
     "Hind",
     "Bunder",

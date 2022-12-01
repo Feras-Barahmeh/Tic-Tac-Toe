@@ -40,7 +40,7 @@ class Shingle:
 
     def ifShingleFill(self):
         for i in self.shingle:
-            if filter(lambda x: x == '', i):
+            if filter(lambda e: e == '', i):
                 return False
         return True
 
