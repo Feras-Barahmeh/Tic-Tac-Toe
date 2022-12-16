@@ -5,16 +5,13 @@ from Shingle import *
 from random import randint
 from GeneralTree import *
 
-class AdversarialSearch(Shingle, AbstractActions):
+class AdversarialSearch(AbstractActions):
     def __init__(self, grid : list, mark):
         super().__init__()
         self.computerMark = mark
         self.personMark = 'X' if mark == 'O' else 'O'
-        self.grid = grid
-        self.player = Player.computer
+        self.grid = grid; self.player = Player.computer
         self.result = []
-
-
 
     @staticmethod
     def getEmptyPositions(shingle : list):
@@ -52,7 +49,6 @@ class AdversarialSearch(Shingle, AbstractActions):
                 coor = statistic["coordinate"]
         return coor
 
-
     def __getStatistics(self, board, result):
         if board.status == StatusGame.win:
             result["win"] += 1
@@ -88,8 +84,9 @@ class AdversarialSearch(Shingle, AbstractActions):
         result = {}
         statistics = []
         if self.ifShingleFill(self.grid): return None
-        if len(self.shingle) * SHINGLE_DIVISION == len(self.getEmptyPositions(self.shingle)):
-            return randint(0, 2), randint(0, 2)
+        if len(self.grid) * SHINGLE_DIVISION == len(self.getEmptyPositions(self.grid)):
+            # return randint(0, 2), randint(0, 2)
+            return 1, 1
 
         for coordinate in self.getEmptyPositions(self.grid):
             newChild = deepcopy(self.grid)
@@ -109,6 +106,13 @@ class AdversarialSearch(Shingle, AbstractActions):
             statistics.append(values)
 
         return self.__chooseMove(statistics)
+
+    def ifShingleFill(self, shingle=None):
+        shingle = shingle if shingle else self.grid
+        for i in shingle:
+            if filter(lambda e: e == '', i):
+                return False
+        return True
 
 # t = AdversarialSearch([
 #     ['O', 'O', 'X'],

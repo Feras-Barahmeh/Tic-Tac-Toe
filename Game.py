@@ -1,9 +1,12 @@
 # from AbstractAction import *
 # from Shingle import *
 # from random import randint
+import random
+
 from Symbol import *
 from Lines import *
 from AdversarialSearch import *
+from UserInterface import *
 class Game(AbstractActions):
     def __init__(self):
         self.shingle = Shingle()
@@ -17,10 +20,14 @@ class Game(AbstractActions):
         self.determinantSymbol = randint(0, 1)
         self.personSymbol = SYMBOLS[self.determinantSymbol - 1]
         self.computerSymbol = SYMBOLS[self.determinantSymbol]
+        self.AIName = random.choice(NAMES)
+
+
 
     def newGame(self):
         """ start game  """
         self.shingle = Shingle()
+        # self.shingle = TreeNode([['' for _ in range(SHINGLE_DIVISION)] for _ in range(SHINGLE_DIVISION)])
 
         # The probability that the computer will start playing 75 %
         self.player = randint(Player.human.value, Player.computer.value) or randint(Player.human.value, Player.computer.value)
@@ -38,32 +45,40 @@ class Game(AbstractActions):
                 x, y = convertTilePositionToPixel(j, i)
                 Symbol(x, y, symbol).createSymbol(self.screen)
 
-    def chickWinner(self, shingle, symbolFor : tuple):
+    def chickWinner(self, shingle):
         """
-        :param shingle: The Shingle We will Checking
-        :param symbolFor: tuple contain (Computer Symbol, Person symbol)
+        :param shingle: The Shingle We will check
         :return:
         """
-        if self.whenWinner(shingle, symbolFor[0]):
-            print("Computer When")
+        if self.__winLine(shingle, self.computerSymbol):
+            self.computerScore += 1
+            userInterface(160, 500, "You Are Lose !").draw(self.screen, 40)
+            userInterface(60, 550, "Click Any Where To Play Agan").draw(self.screen, 20)
             self.playing = False
 
-        elif self.whenWinner(shingle, symbolFor[1]):
-            print("Player When ")
+        elif self.__winLine(shingle, self.personSymbol):
+            self.personScore += 1
+            userInterface(160, 400, "You Are Win").draw(self.screen, 40)
+            userInterface(60, 320, "Click Any Where To Play Agan").draw(self.screen, 20)
             self.playing = False
 
         if self.shingle.ifShingleFill():
-            print("Tie")
+            userInterface(160, 400, "Tie Game").draw(self.screen, 40)
+            userInterface(60, 450, "Click Any Where To Play Agan").draw(self.screen, 20)
             self.playing = False
-        return
+
 
 
     def __showScreen(self):
         self.screen.fill(BACKGROUND_COLOUR)
         self.shingle.divisionShingle(self.screen)
         self.setSymbol()
-        self.chickWinner(self.shingle.shingle, (self.computerSymbol, self.personSymbol))
+        self.chickWinner(self.shingle.shingle)
+
+        userInterface(60, 40, f"You Score : {self.personScore}").draw(self.screen, 40)
+        userInterface(400, 40, f"{self.AIName} (AI) Score : {self.computerScore}").draw(self.screen, 25)
         pygame.display.flip()
+
 
     def testAI(self):
         while True:
@@ -90,26 +105,22 @@ class Game(AbstractActions):
 
     def __update(self):
         if self.player and not self.shingle.ifShingleFill() and not self.ifWinner(self.shingle.shingle, self.personSymbol):
-            # row, col = self.testAI()
-            shingle = deepcopy(self.shingle.shingle)
-            comMark = deepcopy(self.computerSymbol)
-            row, col = AdversarialSearch(shingle, comMark).bestMove
+            row, col = self.testAI()
+            # row, col = AdversarialSearch(self.shingle.shingle, self.computerSymbol).bestMove
             self.switchPlayer(row, col)
-
-
 
 
     def play(self):
         self.playing = True
         while self.playing:
-            self.clock.tick(FPS)
+            self.clock.tick(FPS) # Frames Per Second (means that for every second at most FPS frames should pass)
             self.__events()
             self.__update()
             self.__showScreen()
-        else:
-            self.end_screen()
+        # else:
+        #     self.end_screen()
 
-    def whenWinner(self, shingle, symbol):
+    def __winLine(self, shingle, symbol):
         """
         :param shingle: The patch we want to check
         :param symbol: The player's symbol
@@ -134,14 +145,12 @@ class Game(AbstractActions):
             return None
 
 
-
-
-    def end_screen(self):
+    @staticmethod
+    def end_screen():
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit(0)
-
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     return
