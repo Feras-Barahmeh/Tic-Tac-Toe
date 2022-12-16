@@ -1,8 +1,11 @@
 import pygame
 from enum import Enum
+from abc import ABC
+from Timer import *
+
 # Color
 WHITE = (255, 255, 255)
-BLACK = (25, 25, 25)
+BLACK = (45, 45, 45)
 LIGHTGREY = (100, 100, 100)
 
 # Screen Characteristics
@@ -45,3 +48,8 @@ NAMES = [
     "Tareq",
     "Nofe",
 ]
+
+# Game Configuration
+class StatusGame(Enum):
+    lose = -1; tie = 0; win = 1
+

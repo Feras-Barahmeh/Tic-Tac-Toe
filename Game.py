@@ -1,10 +1,10 @@
-from time import sleep
-from Shingle import *
+# from AbstractAction import *
+# from Shingle import *
+# from random import randint
 from Symbol import *
-from random import randint
 from Lines import *
-
-class Game:
+from AdversarialSearch import *
+class Game(AbstractActions):
     def __init__(self):
         self.shingle = Shingle()
         self.playing = None
@@ -90,7 +90,10 @@ class Game:
 
     def __update(self):
         if self.player and not self.shingle.ifShingleFill() and not self.ifWinner(self.shingle.shingle, self.personSymbol):
-            row, col = self.testAI()
+            # row, col = self.testAI()
+            shingle = deepcopy(self.shingle.shingle)
+            comMark = deepcopy(self.computerSymbol)
+            row, col = AdversarialSearch(shingle, comMark).bestMove
             self.switchPlayer(row, col)
 
 
@@ -131,28 +134,7 @@ class Game:
             return None
 
 
-    @staticmethod
-    def ifWinner(shingle, symbol):
-        """
-        :param shingle: The patch we want to check
-        :param symbol: The player's symbol
-        :return: False if player He Hasn't Won Yet and True if won
-        """
-        for row in range(SHINGLE_DIVISION):
-            if shingle[row][0] == symbol and shingle[row][1] == symbol and shingle[row][2] == symbol:
-                return True
 
-        for col in range(SHINGLE_DIVISION):
-            if shingle[0][col] == symbol and shingle[1][col] == symbol and shingle[2][col] == symbol:
-                return True
-
-        if shingle[0][0] == symbol and shingle[1][1] == symbol and shingle[2][2] == symbol:
-            return True
-
-        if shingle[2][0] == symbol and shingle[1][1] == symbol and shingle[0][2] == symbol:
-            return True
-
-        return False
 
     def end_screen(self):
         while True:

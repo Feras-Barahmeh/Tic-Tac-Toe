@@ -5,6 +5,9 @@ class Shingle:
     def __init__(self):
         self.shingle = [['' for _ in range(SHINGLE_DIVISION)] for _ in range(SHINGLE_DIVISION)]
 
+        self.status = None
+
+
     @staticmethod
     def divisionShingle(screen):
         # pygame.draw.line(surface, colour, (startX, startY), (endX, endY), width)
@@ -38,9 +41,9 @@ class Shingle:
         return None, None
 
 
-    def ifShingleFill(self):
-        for i in self.shingle:
+    def ifShingleFill(self, shingle=None):
+        shingle = shingle if shingle else self.shingle
+        for i in shingle:
             if filter(lambda e: e == '', i):
                 return False
         return True
-
