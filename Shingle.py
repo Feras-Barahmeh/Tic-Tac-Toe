@@ -5,6 +5,7 @@ class Shingle:
     def __init__(self):
         self.shingle = [['' for _ in range(SHINGLE_DIVISION)] for _ in range(SHINGLE_DIVISION)]
 
+
         self.status = None
 
 

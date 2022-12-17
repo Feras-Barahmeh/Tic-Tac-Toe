@@ -22,7 +22,6 @@ class Game(AbstractActions):
         self.computerSymbol = SYMBOLS[self.determinantSymbol]
         self.AIName = random.choice(NAMES)
 
-
     def newGame(self):
         """ start game  """
         self.shingle = Shingle()

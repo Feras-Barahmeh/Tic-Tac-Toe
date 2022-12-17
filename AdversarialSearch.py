@@ -72,12 +72,20 @@ class AdversarialSearch(AbstractActions):
         self.playerTurn = self.__switchPlayer
         return root
 
+    @staticmethod
+    def removeRepeatNode(grid):
+        del grid.childes[0]
+        if grid.childes:
+            for child in grid.childes:
+                child.r()
+        return grid
     def __builtSubTree(self, grid : TreeNode):
-        if grid.childes: del grid.childes[0]
         if not self.ifShingleFill(grid.board) :
             grid = self.__appendChild(grid)
             for child in grid.childes:
                 self.__builtSubTree(child)
+        else:
+            grid = self.removeRepeatNode(grid)
 
         return grid
 
@@ -127,12 +135,12 @@ class AdversarialSearch(AbstractActions):
         return True
 
 
-t = AdversarialSearch([
-    ['', 'O', ''],
-    ['', 'X', 'O'],
-    ['', 'O', 'X']], "X")
+# t = AdversarialSearch([
+#     ['', 'O', ''],
+#     ['', 'X', 'O'],
+#     ['', 'O', 'X']], "X")
 # t = AdversarialSearch([
 #     ['O', 'O', 'X'],
 #     ['X', '', 'O'],
 #     ['', '', 'X']], "X")
-print(t.bestMove)
+# print(t.bestMove)
