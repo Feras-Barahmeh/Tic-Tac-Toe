@@ -1,12 +1,12 @@
 # from AbstractAction import *
 # from Shingle import *
-# from random import randint
 import random
 
 from Symbol import *
 from Lines import *
 from AdversarialSearch import *
 from UserInterface import *
+
 class Game(AbstractActions):
     def __init__(self):
         self.shingle = Shingle()
@@ -23,21 +23,23 @@ class Game(AbstractActions):
         self.AIName = random.choice(NAMES)
 
 
-
     def newGame(self):
         """ start game  """
         self.shingle = Shingle()
-        # self.shingle = TreeNode([['' for _ in range(SHINGLE_DIVISION)] for _ in range(SHINGLE_DIVISION)])
-
         # The probability that the computer will start playing 75 %
         self.player = randint(Player.human.value, Player.computer.value) or randint(Player.human.value, Player.computer.value)
+        self.player = Player.human if self.player == Player.human.value else Player.computer
 
     def switchPlayer(self, row, col):
-        if not self.player:
+        if self.player.value == Player.human.value:
             self.shingle.shingle[row][col] = self.personSymbol
-        else :
+            UserInterface(140, 100, f"{self.AIName} Turn ").draw(self.screen, 60)
+
+        elif self.player.value == Player.computer.value:
             self.shingle.shingle[row][col] = self.computerSymbol
-        self.player = not self.player
+            UserInterface(140, 100, f" YOu Turn ").draw(self.screen, 60)
+
+        self.player = Player.human if self.player.value == Player.computer.value else Player.computer
 
     def setSymbol(self):
         for i, row in enumerate(self.shingle.shingle):
@@ -52,19 +54,15 @@ class Game(AbstractActions):
         """
         if self.__winLine(shingle, self.computerSymbol):
             self.computerScore += 1
-            userInterface(160, 500, "You Are Lose !").draw(self.screen, 40)
-            userInterface(60, 550, "Click Any Where To Play Agan").draw(self.screen, 20)
+            UserInterface(160, 500, "It's a Lose ): ").draw(self.screen, 40)
             self.playing = False
 
         elif self.__winLine(shingle, self.personSymbol):
             self.personScore += 1
-            userInterface(160, 400, "You Are Win").draw(self.screen, 40)
-            userInterface(60, 320, "Click Any Where To Play Agan").draw(self.screen, 20)
+            UserInterface(160, 500, "It's a Win (: ").draw(self.screen, 40)
             self.playing = False
 
         if self.shingle.ifShingleFill():
-            userInterface(160, 400, "Tie Game").draw(self.screen, 40)
-            userInterface(60, 450, "Click Any Where To Play Agan").draw(self.screen, 20)
             self.playing = False
 
 
@@ -74,9 +72,6 @@ class Game(AbstractActions):
         self.shingle.divisionShingle(self.screen)
         self.setSymbol()
         self.chickWinner(self.shingle.shingle)
-
-        userInterface(60, 40, f"You Score : {self.personScore}").draw(self.screen, 40)
-        userInterface(400, 40, f"{self.AIName} (AI) Score : {self.computerScore}").draw(self.screen, 25)
         pygame.display.flip()
 
 
@@ -95,7 +90,7 @@ class Game(AbstractActions):
 
             if e.type == pygame.MOUSEBUTTONDOWN:
                 # Human turn
-                if not self.player and not self.shingle.ifShingleFill() and not self.ifWinner(self.shingle.shingle, self.computerSymbol):
+                if self.player.value == Player.human.value and not self.shingle.ifShingleFill() and not self.ifWinner(self.shingle.shingle, self.computerSymbol):
                     mouseCoordinateX, mouseCoordinateY = pygame.mouse.get_pos()
                     row, col = self.shingle.ifValidClick(mouseCoordinateX, mouseCoordinateY)
                     if row is not None:
@@ -104,11 +99,11 @@ class Game(AbstractActions):
 
 
     def __update(self):
-        if self.player and not self.shingle.ifShingleFill() and not self.ifWinner(self.shingle.shingle, self.personSymbol):
-            row, col = self.testAI()
-            # row, col = AdversarialSearch(self.shingle.shingle, self.computerSymbol).bestMove
+        if self.player.value == Player.computer.value and not self.shingle.ifShingleFill() and not self.ifWinner(self.shingle.shingle, self.personSymbol):
+            # row, col = self.testAI()
+            row, col = AdversarialSearch(self.shingle.shingle, self.computerSymbol).bestMove
             self.switchPlayer(row, col)
-
+            UserInterface(140, 100, f"{self.AIName} Turn ").draw(self.screen, 60)
 
     def play(self):
         self.playing = True
@@ -117,8 +112,8 @@ class Game(AbstractActions):
             self.__events()
             self.__update()
             self.__showScreen()
-        # else:
-        #     self.end_screen()
+        else:
+            self.end_screen()
 
     def __winLine(self, shingle, symbol):
         """

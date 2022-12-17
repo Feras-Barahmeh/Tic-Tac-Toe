@@ -1,7 +1,7 @@
 import pygame
 
 from Configuration import *
-class userInterface:
+class UserInterface:
     def __init__(self, xCoordinate, yCoordinate, content):
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
