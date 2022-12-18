@@ -24,10 +24,10 @@ class AbstractActions(ABC):
 
         return False
 
-    def ifTie(self, board, mark):
-        anotherMark = 'O' if mark == 'X' else 'X'
+    def ifTie(self, board):
 
-        if not self.ifWinner(board, mark[0]) and not self.ifWinner(board, anotherMark):
+        if not self.ifWinner(board, SYMBOLS[0])\
+                and not self.ifWinner(board, SYMBOLS[1]):
             return True
         else:
             return False

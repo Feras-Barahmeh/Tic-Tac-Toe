@@ -49,29 +49,79 @@ class AdversarialSearch(AbstractActions):
         self.playerTurn = self.__switchPlayer
         return root
 
+    @staticmethod
+    def removeRepeatNode(grid):
+        del grid.childes[0]
+        if grid.childes:
+            for child in grid.childes:
+                child.removeRepeatNode()
+        return grid
 
     def __builtSubTree(self, grid : TreeNode):
+
         if self.ifShingleFill(grid.board) :
             self.maxDepth = grid.getLevel
             return grid
-        grid = self.__appendChild(grid)
-        for child in grid.childes:
-            self.__builtSubTree(child)
+
+
+        if not grid.childes:
+            for child in self.__appendChild(grid).childes:
+                self.__builtSubTree(child)
+            self.__builtSubTree(grid)
         return grid
 
-    def minmax(self, board, ):
-        pass
+
+    def minmax(self, board : list, depth, isComputer):
+        if self.ifWinner(board, self.computerMark):
+            return -1
+        elif self.ifWinner(board, self.personMark):
+            return 1
+        elif not self.ifTie(board):
+            return StatusGame.tie
+
+        
+
+        if isComputer:
+            best = float('-inf')
+
+            # Get Possible Move
+            coordinates = self.getEmptyPositions(board)
+            for coordinate in coordinates:
+                child = deepcopy(board)
+
+                child[coordinate[0]][coordinate[1]] = self.personMark
+
+                best = max(best, self.minmax(child, depth + 1, Player.computer.value))
+            return best
+        else:
+            best = float('inf')
+            coordinates = self.getEmptyPositions(board)
+
+            for coordinate in coordinates:
+                child = deepcopy(board)
+                child[coordinate[0]][coordinate[1]] = self.computerMark
+
+                best = min(best, self.minmax(child, depth + 1, Player.human.value))
+            return best
+
+
 
 
     @property
     def bestMove(self):
-        if self.ifShingleFill(self.grid): return None
+        bestVal = -1000
+        bestMove = (-1, -1)
 
-        root = deepcopy(self.grid)
-        root = TreeNode(root)
-        tree = self.__builtSubTree(root)
+        for coordinate in self.getEmptyPositions(self.grid):
+            child = deepcopy(self.grid)
+            child[coordinate[0]][coordinate[1]] = self.personMark
 
-        tree.displayTree()
+            moveValue = self.minmax(child, 0, Player.human.value) # board, depth, turn Player
+
+            if moveValue > bestVal:
+                bestMove = coordinate
+                bestVal = moveValue
+        return bestMove
 
 
 
@@ -86,6 +136,6 @@ class AdversarialSearch(AbstractActions):
 t = AdversarialSearch([
     ['O', 'O', 'X'],
     ['X', 'X', 'O'],
-    ['', '', 'X']], "O")
+    ['', '', '']], "X")
 print(t.bestMove)
 

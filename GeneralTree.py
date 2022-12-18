@@ -60,6 +60,6 @@ def createTree():
 
 
     return root
-root = createTree()
+# root = createTree()
 # root.displayTree()
-root.DFS(root)
+# root.DFS(root)
