@@ -5,6 +5,7 @@ class TreeNode:
         self.childes = []
         self.parent = None
         self.status = None
+        self.visited = []
 
 
     def addChild(self, child):
@@ -28,19 +29,26 @@ class TreeNode:
             grandson = grandson.parent
         return level
 
+    def DFS(self, child):
+        if child not in self.visited:
+            self.visited.append(child)
+            for neighbour in child.childes:
+                self.DFS(neighbour)
+            print(child.board)
+
 
 def createTree():
     root = TreeNode("Electronics")
 
     laptops = TreeNode("Laptops")
     laptops.addChild(TreeNode("MacBook"))
-    laptops.addChild(TreeNode("lenovo"))
-    laptops.addChild(TreeNode("HP"))
+    laptops.addChild(TreeNode("Microsoft"))
+    laptops.addChild(TreeNode("Tinkerpad"))
 
-    phonec = TreeNode("Laptops")
-    phonec.addChild(TreeNode("MacBook"))
-    phonec.addChild(TreeNode("lenovo"))
-    phonec.addChild(TreeNode("HP"))
+    phonec = TreeNode("Cell Phone")
+    phonec.addChild(TreeNode("iphone"))
+    phonec.addChild(TreeNode("Vivo"))
+    phonec.addChild(TreeNode("Google pixle"))
 
     televegin = TreeNode("Teveligin")
     televegin.addChild(TreeNode("TV"))
@@ -52,5 +60,6 @@ def createTree():
 
 
     return root
-# root = createTree()
+root = createTree()
 # root.displayTree()
+root.DFS(root)

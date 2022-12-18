@@ -32,3 +32,11 @@ class AbstractActions(ABC):
         else:
             return False
 
+
+    def ifShingleFill(self, shingle=None):
+        shingle = shingle if shingle else self.grid
+        for i in shingle:
+            if filter(lambda e: e == '', i):
+                return False
+        return True
+
