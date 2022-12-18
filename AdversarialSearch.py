@@ -98,6 +98,11 @@ class AdversarialSearch(AbstractActions):
                 counter += j.count('O')
         return counter
 
+    def minmax(self, board, ):
+        if self.ifShingleFill(board): return board
+        if board.childes:
+            for child in board.childes:
+                self.minmax(child)
     @property
     def bestMove(self):
         statistics = []; coordinates = None
@@ -124,7 +129,7 @@ class AdversarialSearch(AbstractActions):
 
             statistics.append(values)
             self.result = {}
-            break
+
         return self.__chooseMove(statistics)
 
     def ifShingleFill(self, shingle=None):
@@ -144,3 +149,4 @@ class AdversarialSearch(AbstractActions):
 #     ['X', '', 'O'],
 #     ['', '', 'X']], "X")
 # print(t.bestMove)
+
